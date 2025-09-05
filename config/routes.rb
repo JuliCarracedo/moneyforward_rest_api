@@ -5,4 +5,5 @@ Rails.application.routes.draw do
   post "/signup", controller: :users, action: :signup
   get "users/:id", controller: :users, action: :show
   patch "users/:id", controller: :users, action: :update
+  post "close", controller: :users, action: :close
 end

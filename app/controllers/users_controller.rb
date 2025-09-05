@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   include ActionController::HttpAuthentication::Basic::ControllerMethods
 
-  before_action :authenticate_basic, only: %i[show update]
+  before_action :authenticate_basic, only: %i[show update close]
   def signup
     if User.find_by_user_id(params[:user_id])
       return render json: {
@@ -126,10 +126,27 @@ class UsersController < ApplicationController
     end
   end
 
+  def close
+    if @authorized
+      @current_user.destroy
+      render json: {
+          "message": "Account and user successfully removed"
+        }, status: :ok
+
+    else
+      render json: {
+        "message": "Authentication failed"
+      }, status: 401
+    end
+  end
+
+  private
+
   def authenticate_basic
     authenticate_with_http_basic do |username, password|
       @current_username = username
-      @authorized = User.find_by_user_id(username)&.password == password
+      @current_user = User.find_by_user_id(username)
+      @authorized = @current_user&.password == password
     end
   end
 end
